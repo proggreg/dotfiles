@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# This script is stored as .git/hooks/post-checkout
+# Make it executable with: chmod +x .git/hooks/post-checkout
+
+# Parameters passed to the hook by Git:
+# $1 - Previous HEAD
+# $2 - New HEAD
+# $3 - Flag (1 if branch checkout, 0 if file checkout)
+
+prev_head=$1
+new_head=$2
+is_branch_checkout=$3
+
+# Only run on branch checkout, not file checkout
+if [ $is_branch_checkout -eq 1 ]; then
+    # Get the current branch name
+    current_branch=$(git symbolic-ref --short HEAD)
+    # Check if this is a new branch
+    if ! git show-ref --verify --quiet "refs/remotes/origin/$current_branch"; then
+        # echo "🌱 New local branch detected: $current_branch"
+        git push -u origin $current_branch
+    fi
+fi
